@@ -16,10 +16,10 @@ interface Message {
   timestamp: string; 
 }
 
-// Define base URL for API requests
-const API_BASE_URL = 'http://localhost:5000';
-const socket: Socket = io(API_BASE_URL, {
-  transports: ['websocket', 'polling']
+const API_BASE_URL = 'https://localhost/api';
+const socket: Socket = io('https://localhost', {
+  path: '/api/socket.io',
+  transports: ['websocket']
 });
 
 function App() {
@@ -73,7 +73,7 @@ function App() {
         other_id: selectedUser.id 
       });
       
-      const url = `${API_BASE_URL}/api/messages/${user.id}/${selectedUser.id}`;
+      const url = `${API_BASE_URL}/messages/${user.id}/${selectedUser.id}`;
       console.log('Fetching messages from:', url);
       
       fetch(url)
@@ -136,7 +136,7 @@ function App() {
   setError('');
   
   try {
-    const url = `${API_BASE_URL}/api/login`;
+    const url = `${API_BASE_URL}/login`;
     console.log('Login request to:', url);
     console.log('Login data:', formData);
     
@@ -183,7 +183,7 @@ const handleRegister = async (formData: { username: string; password: string }) 
   setError('');
   
   try {
-    const url = `${API_BASE_URL}/api/register`;
+    const url = `${API_BASE_URL}/register`;
     console.log('Register request to:', url);
     console.log('Register data:', formData);
     
