@@ -1,7 +1,7 @@
 export default function GoogleLoginButton() {
   const handleLogin = () => {
     // just redirect to backend endpoint that generates Google OAuth URL
-    window.location.href = "http://localhost:8000/auth/google/url";
+    window.location.href = "https://localhost/api/auth/google/url";
   };
 
   return (

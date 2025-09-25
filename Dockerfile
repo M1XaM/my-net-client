@@ -21,7 +21,7 @@ RUN npm install -g serve
 COPY --from=build /app/dist ./dist
 
 # Expose port
-EXPOSE 3000
+EXPOSE 5173
 
 # Run 'serve' to host the static files
 CMD ["serve", "-s", "dist", "-l", "5173"]
