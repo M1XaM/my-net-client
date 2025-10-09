@@ -1,4 +1,3 @@
-// ChatArea.tsx
 import React, { useState } from 'react';
 import LatexMessage from './LatexMessage';
 
@@ -51,6 +50,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
   return (
     <div className="flex-1 bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
+      {/* Header */}
       <div className="p-4 border-b border-gray-200 bg-white">
         <div className="flex justify-between items-center">
           <h3 className="font-semibold text-gray-800">Chat with {selectedUser.username}</h3>
@@ -69,7 +69,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           </div>
         </div>
       </div>
-      
+
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
         <div className="space-y-4">
           {messages.map(m => (
@@ -82,6 +83,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
                   <LatexMessage 
                     content={m.content} 
                     isOwnMessage={m.sender_id === currentUser?.id}
+                    isLatexMode={isLatexMode} 
                   />
                 </div>
                 <div className={`text-xs mt-1 ${m.sender_id === currentUser?.id ? 'text-blue-100' : 'text-gray-500'}`}>
@@ -92,21 +94,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
           ))}
         </div>
       </div>
-      
+
+      {/* Input */}
       <div className="p-4 border-t border-gray-200 bg-white">
-        {isLatexMode && (
-          <div className="mb-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-            <p className="text-xs text-purple-900 font-semibold mb-1">LaTeX Mode Active</p>
-            <p className="text-xs text-purple-700">
-              Use <code className="bg-purple-100 px-1 rounded">$formula$</code> for inline math, 
-              <code className="bg-purple-100 px-1 rounded ml-1">$$formula$$</code> for display math
-            </p>
-            <p className="text-xs text-purple-600 mt-1">
-              Example: <code className="bg-purple-100 px-1 rounded">$E = mc^2$</code> or <code className="bg-purple-100 px-1 rounded">{'$\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$'}</code>
-            </p>
-          </div>
-        )}
-        
         <div className="flex space-x-2">
           <input
             type="text"
