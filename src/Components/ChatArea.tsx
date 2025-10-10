@@ -1,18 +1,11 @@
 import React, { useState } from 'react';
-import LatexMessage from './LatexMessage';
+import ChatHeader from './ChatHeader';
+import MessageInput from './MessageInput';
+import MessageList from './MessageList';
 
-interface User {
-  id: number;
-  username: string;
-}
-
-interface Message {
-  id: number;
-  sender_id: number;
-  receiver_id: number;
-  content: string;
-  timestamp: string;
-}
+export interface User { id: number; username: string; }
+export interface Message { id: number; sender_id: number; receiver_id: number; content: string; timestamp: string; }
+export type Mode = 'plain' | 'latex' | 'markdown' | 'code' | 'mermaid';
 
 interface ChatAreaProps {
   selectedUser: User | null;
@@ -24,97 +17,28 @@ interface ChatAreaProps {
 }
 
 const ChatArea: React.FC<ChatAreaProps> = ({
-  selectedUser,
-  messages,
-  newMessage,
-  currentUser,
-  onMessageChange,
-  onSendMessage
+  selectedUser, messages, newMessage, currentUser, onMessageChange, onSendMessage
 }) => {
-  const [isLatexMode, setIsLatexMode] = useState(false);
+  const [mode, setMode] = useState<Mode>('plain');
 
   if (!selectedUser) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50">
-        <div className="text-center p-6">
-          <div className="text-gray-400 mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </div>
-          <p className="text-gray-500">Select a user to start chatting</p>
-        </div>
+        <p className="text-gray-500">Select a user to start chatting</p>
       </div>
     );
   }
 
   return (
     <div className="flex-1 bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-white">
-        <div className="flex justify-between items-center">
-          <h3 className="font-semibold text-gray-800">Chat with {selectedUser.username}</h3>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Mode:</span>
-            <button
-              onClick={() => setIsLatexMode(!isLatexMode)}
-              className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
-                isLatexMode 
-                  ? 'bg-purple-600 text-white' 
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              {isLatexMode ? '📐 LaTeX' : '📝 Plain Text'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-        <div className="space-y-4">
-          {messages.map(m => (
-            <div 
-              key={m.id} 
-              className={`flex ${m.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
-            >
-              <div className={`max-w-xs lg:max-w-md xl:max-w-lg rounded-lg p-3 ${m.sender_id === currentUser?.id ? 'bg-blue-500 text-white' : 'bg-white border border-gray-200 text-gray-800'}`}>
-                <div className="message-content">
-                  <LatexMessage 
-                    content={m.content} 
-                    isOwnMessage={m.sender_id === currentUser?.id}
-                    isLatexMode={isLatexMode} 
-                  />
-                </div>
-                <div className={`text-xs mt-1 ${m.sender_id === currentUser?.id ? 'text-blue-100' : 'text-gray-500'}`}>
-                  {new Date(m.timestamp).toLocaleTimeString()}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Input */}
-      <div className="p-4 border-t border-gray-200 bg-white">
-        <div className="flex space-x-2">
-          <input
-            type="text"
-            value={newMessage}
-            onChange={e => onMessageChange(e.target.value)}
-            placeholder={isLatexMode ? "Type LaTeX formula..." : "Type a message..."}
-            onKeyPress={e => e.key === 'Enter' && onSendMessage()}
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <button 
-            onClick={onSendMessage}
-            disabled={!newMessage.trim()}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition disabled:opacity-50"
-          >
-            Send
-          </button>
-        </div>
-      </div>
+      <ChatHeader username={selectedUser.username} mode={mode} setMode={setMode} />
+      <MessageList messages={messages} currentUser={currentUser} mode={mode} />
+      <MessageInput 
+        mode={mode} 
+        newMessage={newMessage} 
+        onMessageChange={onMessageChange} 
+        onSendMessage={onSendMessage} 
+      />
     </div>
   );
 };

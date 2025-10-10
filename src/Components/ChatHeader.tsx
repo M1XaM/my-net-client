@@ -1,0 +1,30 @@
+import React from 'react';
+import type { Mode } from './ChatArea';
+
+interface ChatHeaderProps {
+  username: string;
+  mode: Mode;
+  setMode: (mode: Mode) => void;
+}
+
+const ChatHeader: React.FC<ChatHeaderProps> = ({ username, mode, setMode }) => (
+  <div className="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
+    <h3 className="font-semibold text-gray-800">Chat with {username}</h3>
+    <div className="flex items-center space-x-2">
+      <span className="text-sm text-gray-600">Mode:</span>
+      <select
+        value={mode}
+        onChange={e => setMode(e.target.value as Mode)}
+        className="px-2 py-1 rounded-lg border border-gray-300"
+      >
+        <option value="plain">Plain</option>
+        <option value="latex">LaTeX</option>
+        <option value="markdown">Markdown</option>
+        <option value="code">Code</option>
+        <option value="mermaid">Diagram</option>
+      </select>
+    </div>
+  </div>
+);
+
+export default ChatHeader;
