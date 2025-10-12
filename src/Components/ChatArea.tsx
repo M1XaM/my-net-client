@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import ChatHeader from './ChatHeader';
 import MessageInput from './MessageInput';
 import MessageList from './MessageList';
+import DiagramCanvas from './DiagramCanvas';
 
 export interface User { id: number; username: string; }
 export interface Message { id: number; sender_id: number; receiver_id: number; content: string; timestamp: string; }
-export type Mode = 'plain' | 'latex' | 'markdown' | 'code' | 'diagram';
+export type Mode = 'plain' | 'latex' | 'markdown' | 'code';
 
 interface ChatAreaProps {
   selectedUser: User | null;
@@ -20,6 +21,21 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   selectedUser, messages, newMessage, currentUser, onMessageChange, onSendMessage
 }) => {
   const [mode, setMode] = useState<Mode>('plain');
+  const [showDiagramCanvas, setShowDiagramCanvas] = useState(false);
+
+  const handleOpenDiagram = () => {
+    setShowDiagramCanvas(true);
+  };
+
+  const handleCloseDiagram = () => {
+    setShowDiagramCanvas(false);
+  };
+
+  const handleSendDiagram = (imageData: string) => {
+    // Send the base64 image data as message content
+    onMessageChange(imageData);
+    onSendMessage();
+  };
 
   if (!selectedUser) {
     return (
@@ -37,16 +53,31 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   }
 
   return (
-    <div className="flex-1 bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
-      <ChatHeader username={selectedUser.username} mode={mode} setMode={setMode} />
-      <MessageList messages={messages} currentUser={currentUser} mode={mode} />
-      <MessageInput 
-        mode={mode} 
-        newMessage={newMessage} 
-        onMessageChange={onMessageChange} 
-        onSendMessage={onSendMessage} 
-      />
-    </div>
+    <>
+      <div className="flex-1 bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
+        <ChatHeader 
+          username={selectedUser.username} 
+          mode={mode} 
+          setMode={setMode}
+          onOpenDiagram={handleOpenDiagram}
+        />
+        <MessageList messages={messages} currentUser={currentUser} mode={mode} />
+        <MessageInput 
+          mode={mode} 
+          newMessage={newMessage} 
+          onMessageChange={onMessageChange} 
+          onSendMessage={onSendMessage} 
+        />
+      </div>
+
+      {showDiagramCanvas && (
+        <DiagramCanvas 
+          onClose={handleCloseDiagram}
+          onSend={handleSendDiagram}
+          selectedUser={selectedUser}
+        />
+      )}
+    </>
   );
 };
 
