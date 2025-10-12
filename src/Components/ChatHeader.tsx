@@ -17,11 +17,11 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ username, mode, setMode }) => (
         onChange={e => setMode(e.target.value as Mode)}
         className="px-3 py-1 rounded-lg border border-gray-300 bg-white text-sm font-medium focus:ring-2 focus:ring-blue-500"
       >
-        <option value="plain">📝 Plain</option>
-        <option value="latex">📐 LaTeX</option>
-        <option value="markdown">📄 Markdown</option>
-        <option value="code">💻 Code</option>
-        <option value="mermaid">📊 Diagram</option>
+        <option value="plain">Plain</option>
+        <option value="latex">LaTeX</option>
+        <option value="markdown">Markdown</option>
+        <option value="code">Code</option>
+        <option value="diagram">Diagram</option>
       </select>
     </div>
   </div>
