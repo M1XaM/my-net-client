@@ -1,4 +1,6 @@
-// import * as React from "react";
+import 'katex/dist/katex.min.css';
+import 'prismjs/themes/prism-okaidia.css';
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
