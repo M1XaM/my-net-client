@@ -14,8 +14,12 @@ const AuthPage: React.FC<AuthPageProps> = ({
   loading,
   error,
 }) => {
-  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
-  const [registerForm, setRegisterForm] = useState({
+const [loginForm, setLoginForm] = useState({
+  username: "",
+  password: "",
+  totpCode: ""  // NEW
+});
+const [registerForm, setRegisterForm] = useState({
     username: "",
     password: "",
   });
@@ -75,6 +79,14 @@ const AuthPage: React.FC<AuthPageProps> = ({
                   disabled={loading}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 />
+                <input
+                type="text"
+                placeholder="2FA Code (if enabled)"
+                value={loginForm. totpCode}
+                onChange={(e) => setLoginForm({ ...loginForm, totpCode: e.target.value })}
+                maxLength={6}
+                className="w-full px-4 py-2 border rounded"
+              />
               </div>
               <button
                 type="submit"

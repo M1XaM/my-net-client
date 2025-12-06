@@ -129,31 +129,45 @@ function App() {
     setNewMessage('');
   };
 
-  const handleLogin = async (formData: { username: string; password: string }) => {
+  const handleLogin = async (formData: { username: string; password: string; totpCode?: string }) => {
     setLoading(true);
     setError('');
     try {
       const url = `${API_BASE_URL}/login`;
+      const body: any = {
+        username: formData.username,
+        password: formData.password
+      };
+
+      // Add 2FA code if provided
+      if (formData.totpCode) {
+        body.totp_token = formData.totpCode;
+      }
+
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-        credentials: 'include', // get cookie for refresh
+        body: JSON.stringify(body),
+        credentials: 'include',
       });
-      if (!response.ok) throw new Error('Login failed: ' + response.status);
+
+      if (!response.ok) throw new Error('Login failed');
       const data = await response.json();
+
+      // Check if 2FA is required
+      if (data.requires_2fa) {
+        setError('Please enter your 2FA code');
+        setLoading(false);
+        // Show 2FA input in your login form
+        return;
+      }
+
+      // Success - login complete
       setUser({ id: data.id, username: data.username });
       setAccessToken(data.access_token);
-      setCsrfToken(data.csrf_token);
-
       localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username }));
       localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('csrf_token', data.csrf_token);
-
-      console.log('access_token', data.access_token)
-      console.log('access_token',data.csrf_token)
-
-      socket.emit('user_connected', { id: data.id, username: data.username });
+      socket.emit('user_connected', { id: data. id, username: data.username });
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -273,6 +287,8 @@ function App() {
       messages={messages}
       newMessage={newMessage}
       error={error}
+      accessToken={accessToken || ''}  // ADD THIS LINE
+
       onSelectUser={setSelectedUser}
       onMessageChange={setNewMessage}
       onSendMessage={sendMessage}
