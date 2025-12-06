@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import AuthPage from '../Pages/AuthPage';
 import ChatPage from '../Pages/ChatPage';
+import EmailVerificationPage from '../Pages/EmailVerificationPage';
 
 interface User { 
   id: number; 
@@ -11,7 +12,7 @@ interface User {
 }
 
 interface Message { 
-  id: number; 
+  id: number;
   sender_id: number; 
   receiver_id: number; 
   content: string; 
@@ -32,6 +33,13 @@ function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [verificationState, setVerificationState] = useState<{
+  status: 'idle' | 'pending_verification';
+  userId: number | null;
+  email: string | null;
+}>({ status: 'idle', userId: null, email: null });
+
+const [verificationCode, setVerificationCode] = useState('');
   const [newMessage, setNewMessage] = useState('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -174,35 +182,89 @@ function App() {
       setLoading(false);
     }
   };
+const handleVerifyEmail = async () => {
+  if (!verificationState.userId || !verificationCode) {
+    setError('Please enter the verification code');
+    return;
+  }
 
-  const handleRegister = async (formData: { username: string; password: string }) => {
-    setLoading(true);
-    setError('');
-    try {
-      const url = `${API_BASE_URL}/register`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-        credentials: 'include',
+  setLoading(true);
+  setError('');
+  try {
+    const url = `${API_BASE_URL}/verify-email`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: verificationState.userId,
+        verification_code: verificationCode,
+      }),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData. error || 'Verification failed');
+    }
+
+    const data = await response.json();
+
+    // ← AUTO-LOGIN after verification
+    setUser({ id: data.id, username: data.username });
+    setAccessToken(data.access_token);
+    setCsrfToken(data.csrf_token); // ← ADD THIS
+    localStorage.setItem('user', JSON. stringify({ id: data.id, username: data.username }));
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('csrf_token', data.csrf_token); // ← ADD THIS
+
+    // ← RESET verification state
+    setVerificationState({ status: 'idle', userId: null, email: null });
+    setVerificationCode('');
+
+    socket.emit('user_connected', { id: data.id, username: data.username });
+  } catch (err) {
+    setError((err as Error).message);
+  } finally {
+    setLoading(false);
+  }
+};
+const handleRegister = async (formData: { username: string; password: string; email: string }) => {
+  setLoading(true);
+  setError('');
+  try {
+    const url = `${API_BASE_URL}/register`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+      credentials: 'include',
+    });
+
+    if (!response.ok) throw new Error('Registration failed: ' + response.status);
+    const data = await response.json();
+
+    // ← NEW: Check if pending verification
+    if (data.status === 'pending_verification') {
+      setVerificationState({
+        status: 'pending_verification',
+        userId: data.user_id,
+        email: data.email
       });
-      if (!response.ok) throw new Error('Registration failed: ' + response.status);
-      const data = await response.json();
+      setError('');
+    } else {
+      // ← AUTO-LOGIN if verified immediately
       setUser({ id: data.id, username: data.username });
       setAccessToken(data.access_token);
-      setCsrfToken(data.csrf_token);
-
       localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username }));
       localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('csrf_token', data.csrf_token);
-
       socket.emit('user_connected', { id: data.id, username: data.username });
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (err) {
+    setError((err as Error).message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
   // Fetch users whenever user logs in or token changes
@@ -268,33 +330,45 @@ function App() {
     return res;
   };
 
-  if (!user) {
-    return (
-      <AuthPage
-        onLogin={handleLogin}
-        onRegister={handleRegister}
-        loading={loading}
-        error={error}
-      />
-    );
-  }
-
+  if (verificationState.status === 'pending_verification') {
   return (
-    <ChatPage
-      user={user}
-      users={users}
-      selectedUser={selectedUser}
-      messages={messages}
-      newMessage={newMessage}
+    <EmailVerificationPage
+      email={verificationState.email || ''}
+      onVerify={handleVerifyEmail}
+      loading={loading}
       error={error}
-      accessToken={accessToken || ''}  // ADD THIS LINE
-
-      onSelectUser={setSelectedUser}
-      onMessageChange={setNewMessage}
-      onSendMessage={sendMessage}
-      onLogout={handleLogout}
     />
   );
 }
+
+// Original auth page if no user
+if (!user) {
+  return (
+    <AuthPage
+      onLogin={handleLogin}
+      onRegister={handleRegister}
+      loading={loading}
+      error={error}
+    />
+  );
+}
+
+// Chat page if logged in
+return (
+  <ChatPage
+    user={user}
+    users={users}
+    selectedUser={selectedUser}
+    messages={messages}
+    newMessage={newMessage}
+    error={error}
+    accessToken={accessToken}  // ← ADD THIS LINE
+
+    onSelectUser={setSelectedUser}
+    onMessageChange={setNewMessage}
+    onSendMessage={sendMessage}
+    onLogout={handleLogout}
+  />
+);}
 
 export default App;

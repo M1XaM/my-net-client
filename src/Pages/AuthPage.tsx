@@ -3,7 +3,7 @@ import GoogleLoginButton from "./loginButton";
 
 interface AuthPageProps {
   onLogin: (formData: { username: string; password: string }) => void;
-  onRegister: (formData: { username: string; password: string }) => void;
+  onRegister: (formData: { username: string; password: string; email: string }) => void; // ← ADD email
   loading: boolean;
   error: string;
 }
@@ -17,11 +17,13 @@ const AuthPage: React.FC<AuthPageProps> = ({
 const [loginForm, setLoginForm] = useState({
   username: "",
   password: "",
-  totpCode: ""  // NEW
+  totpCode: ""
 });
 const [registerForm, setRegisterForm] = useState({
     username: "",
     password: "",
+    email: "",
+
   });
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -141,7 +143,23 @@ const [registerForm, setRegisterForm] = useState({
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 />
               </div>
-              <button
+              <div>
+                    <input
+                      type="email"
+                      placeholder="Email Address"
+                      value={registerForm. email}
+                      onChange={(e) =>
+                        setRegisterForm({
+                          ...registerForm,
+                          email: e.target.value,
+                        })
+                      }
+                      required
+                      disabled={loading}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    />
+                  </div>
+                  <button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition disabled:opacity-50"

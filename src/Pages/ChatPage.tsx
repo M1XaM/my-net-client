@@ -24,7 +24,7 @@ interface ChatPageProps {
   messages: Message[];
   newMessage: string;
   error: string;
-  accessToken: string;  // ADD THIS - needed for 2FA
+  accessToken: string | null;  // ← This is required
   onSelectUser: (user: User) => void;
   onMessageChange: (message: string) => void;
   onSendMessage: () => void;
@@ -95,16 +95,16 @@ const ChatPage: React.FC<ChatPageProps> = ({
       </div>
 
       {/* Modal for 2FA Setup - inside the return statement */}
-      {showSetup && (
-        <TwoFactorSetup
-          accessToken={accessToken}
-          onClose={() => setShowSetup(false)}
-          onSuccess={() => {
-            alert('2FA is now enabled!');
-            setShowSetup(false);
-          }}
-        />
-      )}
+      {showSetup && accessToken && (
+      <TwoFactorSetup
+        accessToken={accessToken}
+        onClose={() => setShowSetup(false)}
+        onSuccess={() => {
+          alert('2FA is now enabled!');
+          setShowSetup(false);
+        }}
+      />
+    )}
     </div>
   );
 };
