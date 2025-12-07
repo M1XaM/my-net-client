@@ -8,15 +8,15 @@ interface User {
   id: number; 
   username: string;
   access_token?: string;
-  csrf_token?:string;
+  csrf_token?: string;
 }
 
-interface Message { 
+interface Message {
   id: number;
-  sender_id: number; 
-  receiver_id: number; 
-  content: string; 
-  timestamp: string; 
+  sender_id: number;
+  receiver_id: number;
+  content: string;
+  timestamp: string;
 }
 
 const API_BASE_URL = 'https://localhost/api';
@@ -34,16 +34,16 @@ function App() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [verificationState, setVerificationState] = useState<{
-  status: 'idle' | 'pending_verification';
-  userId: number | null;
-  email: string | null;
-}>({ status: 'idle', userId: null, email: null });
+    status: 'idle' | 'pending_verification';
+    userId: number | null;
+    email: string | null;
+  }>({ status: 'idle', userId: null, email: null });
 
-const [verificationCode, setVerificationCode] = useState('');
   const [newMessage, setNewMessage] = useState('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
+  // ✅ Load user data from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     const savedToken = localStorage.getItem('access_token');
@@ -59,15 +59,15 @@ const [verificationCode, setVerificationCode] = useState('');
         socket.emit('user_connected', parsedUser);
       } catch (err) {
         const error = err as Error;
-        setError('Failed to parse saved user data: ' + error.message);
+        setError('Failed to parse saved user data: ' + error. message);
         localStorage.removeItem('user');
         localStorage.removeItem('access_token');
         localStorage.removeItem('csrf_token');
-
       }
     }
   }, []);
 
+  // ✅ Setup socket event listeners
   useEffect(() => {
     socket.on('receive_message', (msg: Message) => {
       setMessages(prev => [...prev, msg]);
@@ -84,10 +84,11 @@ const [verificationCode, setVerificationCode] = useState('');
     return () => {
       socket.off('receive_message');
       socket.off('users_list');
-      socket.off('connect_error');
+      socket. off('connect_error');
     };
   }, []);
 
+  // ✅ Fetch messages when user or selected user changes
   useEffect(() => {
     if (user && selectedUser) {
       socket.emit('join', {
@@ -105,11 +106,26 @@ const [verificationCode, setVerificationCode] = useState('');
           setMessages(data);
         })
         .catch((err: Error) => {
-          setError('Error fetching messages: ' + err.message);
+          setError('Error fetching messages: ' + err. message);
         });
     }
-  }, [user, selectedUser, accessToken]); // refetch on token change
+  }, [user, selectedUser, accessToken]);
 
+  // ✅ Fetch users list when user logs in
+  useEffect(() => {
+    if (user) {
+      const url = `${API_BASE_URL}/users`;
+      fetchWithAuth(url)
+        .then(async (res) => {
+          if (!res.ok) throw new Error('Failed to fetch users: ' + res.status);
+          return res.json();
+        })
+        .then(data => setUsers(data))
+        .catch((err: Error) => setError('Error fetching users: ' + err.message));
+    }
+  }, [user, accessToken]);
+
+  // ✅ Handle logout
   const handleLogout = async () => {
     if (user) socket.emit('user_disconnected', user);
     setUser(null);
@@ -122,12 +138,12 @@ const [verificationCode, setVerificationCode] = useState('');
     localStorage.removeItem('access_token');
     localStorage.removeItem('csrf_token');
 
-    // Optionally: call backend to clear refresh token
     await fetch(`${API_BASE_URL}/logout`, { method: 'POST', credentials: 'include' });
   };
 
+  // ✅ Send message via socket
   const sendMessage = () => {
-    if (!newMessage.trim() || !user || !selectedUser) return;
+    if (! newMessage.trim() || !user || !selectedUser) return;
     const messageData = {
       sender_id: user.id,
       receiver_id: selectedUser.id,
@@ -137,6 +153,7 @@ const [verificationCode, setVerificationCode] = useState('');
     setNewMessage('');
   };
 
+  // ✅ Handle user login
   const handleLogin = async (formData: { username: string; password: string; totpCode?: string }) => {
     setLoading(true);
     setError('');
@@ -166,209 +183,205 @@ const [verificationCode, setVerificationCode] = useState('');
       if (data.requires_2fa) {
         setError('Please enter your 2FA code');
         setLoading(false);
-        // Show 2FA input in your login form
         return;
       }
 
       // Success - login complete
       setUser({ id: data.id, username: data.username });
       setAccessToken(data.access_token);
-      localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username }));
+      setCsrfToken(data.csrf_token);
+      localStorage.setItem('user', JSON. stringify({ id: data.id, username: data.username }));
       localStorage.setItem('access_token', data.access_token);
-      socket.emit('user_connected', { id: data. id, username: data.username });
+      localStorage.setItem('csrf_token', data.csrf_token);
+      socket.emit('user_connected', { id: data.id, username: data.username });
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setLoading(false);
     }
   };
-const handleVerifyEmail = async () => {
-  if (!verificationState.userId || !verificationCode) {
-    setError('Please enter the verification code');
-    return;
-  }
 
-  setLoading(true);
-  setError('');
-  try {
-    const url = `${API_BASE_URL}/verify-email`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: verificationState.userId,
-        verification_code: verificationCode,
-      }),
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData. error || 'Verification failed');
-    }
-
-    const data = await response.json();
-
-    // ← AUTO-LOGIN after verification
-    setUser({ id: data.id, username: data.username });
-    setAccessToken(data.access_token);
-    setCsrfToken(data.csrf_token); // ← ADD THIS
-    localStorage.setItem('user', JSON. stringify({ id: data.id, username: data.username }));
-    localStorage.setItem('access_token', data.access_token);
-    localStorage.setItem('csrf_token', data.csrf_token); // ← ADD THIS
-
-    // ← RESET verification state
-    setVerificationState({ status: 'idle', userId: null, email: null });
-    setVerificationCode('');
-
-    socket.emit('user_connected', { id: data.id, username: data.username });
-  } catch (err) {
-    setError((err as Error).message);
-  } finally {
-    setLoading(false);
-  }
-};
-const handleRegister = async (formData: { username: string; password: string; email: string }) => {
-  setLoading(true);
-  setError('');
-  try {
-    const url = `${API_BASE_URL}/register`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-      credentials: 'include',
-    });
-
-    if (!response.ok) throw new Error('Registration failed: ' + response.status);
-    const data = await response.json();
-
-    // ← NEW: Check if pending verification
-    if (data.status === 'pending_verification') {
-      setVerificationState({
-        status: 'pending_verification',
-        userId: data.user_id,
-        email: data.email
+  // ✅ Handle user registration
+  const handleRegister = async (formData: { username: string; password: string; email: string }) => {
+    setLoading(true);
+    setError('');
+    try {
+      const url = `${API_BASE_URL}/register`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+        credentials: 'include',
       });
-      setError('');
-    } else {
-      // ← AUTO-LOGIN if verified immediately
-      setUser({ id: data.id, username: data.username });
+
+      if (!response.ok) throw new Error('Registration failed: ' + response.status);
+      const data = await response.json();
+
+      // Check if pending verification
+      if (data.status === 'pending_verification') {
+        setVerificationState({
+          status: 'pending_verification',
+          userId: data.user_id,
+          email: data.email
+        });
+        setError('');
+      } else {
+        // Auto-login if verified immediately
+        setUser({ id: data.id, username: data.username });
+        setAccessToken(data.access_token);
+        setCsrfToken(data.csrf_token);
+        localStorage.setItem('user', JSON.stringify({ id: data.id, username: data. username }));
+        localStorage.setItem('access_token', data. access_token);
+        localStorage. setItem('csrf_token', data.csrf_token);
+        socket.emit('user_connected', { id: data.id, username: data.username });
+      }
+    } catch (err) {
+      setError((err as Error). message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Handle email verification
+  const handleVerifyEmail = async (code: string) => {
+    if (!verificationState.userId || !code) {
+      setError('Please enter the verification code');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    try {
+      const url = `${API_BASE_URL}/verify-email`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: verificationState.userId,
+          verification_code: code,
+        }),
+        credentials: 'include',
+      });
+
+      if (! response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Verification failed');
+      }
+
+      const data = await response.json();
+
+      // Auto-login after verification
+      setUser({ id: data.id, username: data. username });
       setAccessToken(data.access_token);
-      localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username }));
+      setCsrfToken(data. csrf_token);
+      localStorage. setItem('user', JSON.stringify({ id: data.id, username: data.username }));
       localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('csrf_token', data.csrf_token);
+
+      // Reset verification state
+      setVerificationState({ status: 'idle', userId: null, email: null });
+
       socket.emit('user_connected', { id: data.id, username: data.username });
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setError((err as Error).message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-  useEffect(() => {
-  // Fetch users whenever user logs in or token changes
-  if (user) {
-    const url = `${API_BASE_URL}/users`;
-    fetchWithAuth(url)
-      .then(async (res) => {
-        if (!res.ok) throw new Error('Failed to fetch users: ' + res.status);
-        return res.json();
-      })
-      .then(data => setUsers(data))
-      .catch((err: Error) => setError('Error fetching users: ' + err.message));
-    }
-  }, [user, accessToken]);
-
-
-  // Authenticated fetch helper
+  // ✅ Authenticated fetch helper with token refresh
   const fetchWithAuth = async (url: string, options: any = {}) => {
     let token = accessToken || localStorage.getItem('access_token');
     let csrf = csrfToken || localStorage.getItem('csrf_token');
 
     let headers = {
-          ...(options.headers || {}),
-          'Authorization': `Bearer ${token}`,
-        };
-        // Send CSRF for POST/PUT/DELETE requests
-        if (options.method && ['POST', 'PUT', 'DELETE'].includes(options.method.toUpperCase()) && csrf) {
-          headers['X-CSRF-Token'] = csrf;
-        }
-        let res = await fetch(url, {
-          ...options,
-          headers,
-          credentials: 'include',
-        });
+      ...(options.headers || {}),
+      'Authorization': `Bearer ${token}`,
+    };
+
+    // Send CSRF for POST/PUT/DELETE requests
+    if (options.method && ['POST', 'PUT', 'DELETE'].includes(options.method.toUpperCase()) && csrf) {
+      headers['X-CSRF-Token'] = csrf;
+    }
+
+    let res = await fetch(url, {
+      ...options,
+      headers,
+      credentials: 'include',
+    });
+
+    // Handle token expiry with refresh
     if (res.status === 401) {
-      // Try refresh
       const refreshRes = await fetch(`${API_BASE_URL}/token/refresh`, {
         method: 'POST',
         credentials: 'include',
-        headers: csrf ? { 'X-CSRF-Token': csrf } : {},
-
+        headers: csrf ?  { 'X-CSRF-Token': csrf } : {},
       });
-      if (refreshRes.ok) {
+
+      if (refreshRes. ok) {
         const refreshData = await refreshRes.json();
-        setAccessToken(refreshData.access_token);
+        setAccessToken(refreshData. access_token);
         setCsrfToken(refreshData.csrf_token);
 
         localStorage.setItem('access_token', refreshData.access_token);
         localStorage.setItem('csrf_token', refreshData.csrf_token);
 
-        // Retry original request
+        // Retry original request with new token
         res = await fetch(url, {
           ...options,
           headers: {
             ...headers,
             'Authorization': `Bearer ${refreshData.access_token}`,
-            ...(csrf ? { 'X-CSRF-Token': refreshData.csrf_token } : {}),
+            ...(refreshData.csrf_token ? { 'X-CSRF-Token': refreshData.csrf_token } : {}),
           },
           credentials: 'include',
         });
       }
     }
+
     return res;
   };
 
+  // ✅ Show email verification page
   if (verificationState.status === 'pending_verification') {
+    return (
+      <EmailVerificationPage
+        email={verificationState.email || ''}
+        onVerify={handleVerifyEmail}
+        loading={loading}
+        error={error}
+      />
+    );
+  }
+
+  // ✅ Show auth page if not logged in
+  if (!user) {
+    return (
+      <AuthPage
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+        loading={loading}
+        error={error}
+      />
+    );
+  }
+
+  // ✅ Show chat page if logged in
   return (
-    <EmailVerificationPage
-      email={verificationState.email || ''}
-      onVerify={handleVerifyEmail}
-      loading={loading}
+    <ChatPage
+      user={user}
+      users={users}
+      selectedUser={selectedUser}
+      messages={messages}
+      newMessage={newMessage}
       error={error}
+      accessToken={accessToken}
+      onSelectUser={setSelectedUser}
+      onMessageChange={setNewMessage}
+      onSendMessage={sendMessage}
+      onLogout={handleLogout}
     />
   );
 }
-
-// Original auth page if no user
-if (!user) {
-  return (
-    <AuthPage
-      onLogin={handleLogin}
-      onRegister={handleRegister}
-      loading={loading}
-      error={error}
-    />
-  );
-}
-
-// Chat page if logged in
-return (
-  <ChatPage
-    user={user}
-    users={users}
-    selectedUser={selectedUser}
-    messages={messages}
-    newMessage={newMessage}
-    error={error}
-    accessToken={accessToken}  // ← ADD THIS LINE
-
-    onSelectUser={setSelectedUser}
-    onMessageChange={setNewMessage}
-    onSendMessage={sendMessage}
-    onLogout={handleLogout}
-  />
-);}
 
 export default App;
