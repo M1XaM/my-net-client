@@ -13,6 +13,8 @@ const TwoFactorSetup: React.FC<TwoFactorSetupProps> = ({ accessToken, onClose, o
   const [error, setError] = useState('');
   const [step, setStep] = useState<'scan' | 'verify'>('scan');
 
+
+  // lkjlk
   useEffect(() => {
     // Get QR code from server
     fetch('https://localhost/api/2fa/setup', {
