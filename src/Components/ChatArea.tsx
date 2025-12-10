@@ -52,7 +52,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({
 
   return (
     <>
-      <div className="flex-1 bg-[#EDF2F7] flex flex-col overflow-hidden">
+      <div className="flex-1 bg-[#EDF2F7] flex flex-col overflow-y-scroll">
         <ChatHeader 
           username={selectedUser.username} 
           onOpenDiagram={handleOpenDiagram}
