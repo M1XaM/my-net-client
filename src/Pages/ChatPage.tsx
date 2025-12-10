@@ -48,21 +48,26 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [showSetup, setShowSetup] = useState(false);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
-      <header className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 shadow-md">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">ChatApp</h1>
-          <div className="flex items-center space-x-4">
-            <span className="font-medium">Welcome, {user.username}</span>
+    <div className="h-screen flex flex-col bg-[#EDF2F7]">
+      <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-[#7B61FF] rounded-xl flex justify-center items-center text-white font-bold text-lg">
+              M
+            </div>
+            <h1 className="text-xl font-bold text-gray-900">MyNet</h1>
+          </div>
+          <div className="flex items-center space-x-3">
+            <span className="text-sm text-gray-600">Welcome, <span className="font-semibold text-gray-900">{user.username}</span></span>
             <button
               onClick={() => setShowSetup(true)}
-              className="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded text-sm"
+              className="bg-[#7B61FF19] hover:bg-[#7B61FF40] text-[#7B61FF] px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors"
             >
               Enable 2FA
             </button>
             <button
               onClick={onLogout}
-              className="bg-white text-blue-600 hover:bg-blue-100 font-medium py-1 px-3 rounded-lg transition"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-1.5 px-4 rounded-lg transition-colors"
             >
               Logout
             </button>
@@ -71,12 +76,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
       </header>
 
       {error && (
-        <div className="mx-4 mt-4 p-3 bg-red-100 text-red-700 rounded-lg border border-red-200">
+        <div className="mx-6 mt-4 p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 text-sm">
           {error}
         </div>
       )}
 
-      <div className="flex flex-1 overflow-hidden container mx-auto p-4 gap-4">
+      <div className="flex flex-1 overflow-hidden">
         <OnlineUsersSidebar
           users={users}
           selectedUser={selectedUser}

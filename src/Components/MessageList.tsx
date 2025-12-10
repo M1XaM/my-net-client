@@ -16,18 +16,17 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentUser, mode }
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-      <div className="space-y-4">
-        {messages.map(m => (
+    <div className="flex-1 overflow-y-scroll w-full min-h-0 px-7" id="messageContainer">
+      {messages.map(m => (
+        <div key={m.id} className={`flex ${m.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'} my-4`}>
           <MessageItem 
-            key={m.id} 
             message={m} 
             isOwn={m.sender_id === currentUser?.id} 
             mode={mode} 
           />
-        ))}
-        <div ref={bottomRef} />
-      </div>
+        </div>
+      ))}
+      <div ref={bottomRef} />
     </div>
   );
 };

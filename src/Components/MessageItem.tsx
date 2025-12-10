@@ -51,18 +51,16 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, mode }) => {
   };
 
   return (
-    <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-      <div className={`${isImage() ? 'max-w-2xl' : 'max-w-xs lg:max-w-md xl:max-w-lg'} rounded-lg p-3 ${
-        isOwn 
-          ? 'bg-blue-500 text-white' 
-          : 'bg-white border border-gray-200 text-gray-800'
-      }`}>
-        <div className="message-content">
-          {renderContent()}
-        </div>
-        <div className={`text-xs mt-1 ${isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
-          {new Date(message.timestamp).toLocaleTimeString()}
-        </div>
+    <div className={`${isImage() ? 'max-w-[75%]' : 'max-w-[75%] md:max-w-[60%]'} p-3 rounded-lg ${
+      isOwn 
+        ? 'bg-[#7B61FF] text-white' 
+        : 'bg-white text-black shadow-sm'
+    }`}>
+      <div className="message-content">
+        {renderContent()}
+      </div>
+      <div className={`text-[12px] mt-1 ${isOwn ? 'text-white/70' : 'text-black/70'}`}>
+        {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
       </div>
     </div>
   );
