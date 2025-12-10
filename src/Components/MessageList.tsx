@@ -9,13 +9,28 @@ interface MessageListProps {
 
 const MessageList: React.FC<MessageListProps> = ({ messages, currentUser }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Scroll to bottom whenever messages change
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
 
+  // Also scroll to bottom on mount
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, []);
+
   return (
-    <div className="flex-1 overflow-y-scroll w-full min-h-0 px-7" id="messageContainer">
+    <div 
+      ref={containerRef}
+      className="flex-1 overflow-y-scroll w-full min-h-0 px-7 py-4" 
+      id="messageContainer"
+    >
       {messages.map(m => (
         <div key={m.id} className={`flex ${m.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'} my-4`}>
           <MessageItem 

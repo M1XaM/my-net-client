@@ -38,8 +38,9 @@ const AuthPage: React.FC<AuthPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#7B61FF] to-[#5B47CC] p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#7B61FF] to-[#5B47CC] p-4 overflow-y-auto">
+      <div className="min-h-screen flex items-center justify-center py-8 overflow-y-auto">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="w-16 h-16 bg-[#7B61FF] rounded-2xl flex justify-center items-center text-white font-bold text-3xl">
@@ -229,6 +230,7 @@ const AuthPage: React.FC<AuthPageProps> = ({
               {isLogin ? "Sign up" : "Sign in"}
             </button>
           </p>
+        </div>
         </div>
       </div>
     </div>
