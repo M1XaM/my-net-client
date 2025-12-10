@@ -48,7 +48,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [showSetup, setShowSetup] = useState(false);
 
   return (
-    <div className="h-screen flex flex-col bg-[#EDF2F7]">
+    <div className="h-screen overflow-y-hidden flex flex-col bg-[#EDF2F7]">
       <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">

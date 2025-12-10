@@ -16,6 +16,11 @@
   }
 }
 
+html {
+  height: 100vh;
+  overflow-y: hidden;
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
 }

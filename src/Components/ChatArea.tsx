@@ -6,7 +6,6 @@ import DiagramCanvas from './DiagramCanvas';
 
 export interface User { id: number; username: string; }
 export interface Message { id: number; sender_id: number; receiver_id: number; content: string; timestamp: string; }
-export type Mode = 'plain' | 'latex' | 'markdown' | 'code';
 
 interface ChatAreaProps {
   selectedUser: User | null;
@@ -20,7 +19,6 @@ interface ChatAreaProps {
 const ChatArea: React.FC<ChatAreaProps> = ({
   selectedUser, messages, newMessage, currentUser, onMessageChange, onSendMessage
 }) => {
-  const [mode, setMode] = useState<Mode>('plain');
   const [showDiagramCanvas, setShowDiagramCanvas] = useState(false);
 
   const handleOpenDiagram = () => {
@@ -57,13 +55,10 @@ const ChatArea: React.FC<ChatAreaProps> = ({
       <div className="flex-1 bg-[#EDF2F7] flex flex-col overflow-hidden">
         <ChatHeader 
           username={selectedUser.username} 
-          mode={mode} 
-          setMode={setMode}
           onOpenDiagram={handleOpenDiagram}
         />
-        <MessageList messages={messages} currentUser={currentUser} mode={mode} />
+        <MessageList messages={messages} currentUser={currentUser}/>
         <MessageInput 
-          mode={mode} 
           newMessage={newMessage} 
           onMessageChange={onMessageChange} 
           onSendMessage={onSendMessage} 
