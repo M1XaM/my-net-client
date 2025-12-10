@@ -18,16 +18,29 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({ content }) => (
               style={vscDarkPlus} 
               language={match[1]} 
               PreTag="div" 
+              customStyle={{
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                margin: '0.5rem 0'
+              }}
               {...props}
             >
               {String(children).replace(/\n$/, '')}
             </SyntaxHighlighter>
           ) : (
-            <code className="bg-gray-200 px-1 py-0.5 rounded text-sm" {...props}>
+            <code className="bg-purple-100 text-[#7B61FF] px-2 py-0.5 rounded text-sm font-mono" {...props}>
               {children}
             </code>
           );
-        }
+        },
+        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+        strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
+        em: ({ children }) => <em className="italic">{children}</em>,
+        a: ({ children, href }) => (
+          <a href={href} className="text-[#7B61FF] hover:text-[#6951E0] underline" target="_blank" rel="noopener noreferrer">
+            {children}
+          </a>
+        )
       }}
     >
       {content}

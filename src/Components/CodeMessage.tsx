@@ -26,8 +26,11 @@ const CodeMessage: React.FC<CodeMessageProps> = ({ content, language = 'javascri
         customStyle={{
           margin: 0,
           borderRadius: '0.5rem',
-          fontSize: '0.875rem'
+          fontSize: '0.875rem',
+          padding: '1rem'
         }}
+        wrapLines={true}
+        wrapLongLines={true}
       >
         {cleanContent}
       </SyntaxHighlighter>
