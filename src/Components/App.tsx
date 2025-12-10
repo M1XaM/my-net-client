@@ -19,8 +19,8 @@ interface Message {
   timestamp: string;
 }
 
-const API_BASE_URL = 'https://localhost/api';
-const socket: Socket = io('https://localhost', {
+const API_BASE_URL = `${window.location.origin}/api`;
+const socket: Socket = io(window.location.origin, {
   path: '/api/socket.io',
   transports: ['websocket']
 });
