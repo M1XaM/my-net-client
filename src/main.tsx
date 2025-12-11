@@ -3,7 +3,7 @@ import 'prismjs/themes/prism-okaidia.css';
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import 'katex/dist/katex.min.css';
 import App from "./Components/App";
