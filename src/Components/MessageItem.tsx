@@ -10,8 +10,10 @@ interface MessageItemProps {
 const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn }) => {
   // Check if message content is a base64 image
   const isImage = () => {
+    if (!message || typeof message.content !== 'string') return false;
     return message.content.startsWith('data:image/');
   };
+
 
   const renderContent = () => {
     if (!message.content || message.content.trim() === '') {
@@ -51,8 +53,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn }) => {
 
   return (
     <div className={`${isImage() ? 'max-w-[75%]' : 'max-w-[75%] md:max-w-[60%]'} p-3 rounded-lg ${isOwn
-        ? 'bg-[#7B61FF] text-white'
-        : 'bg-white text-black shadow-sm'
+      ? 'bg-[#7B61FF] text-white'
+      : 'bg-white text-black shadow-sm'
       }`}>
       <div className="message-content">
         {renderContent()}
