@@ -28,6 +28,7 @@ interface ChatPageProps {
   onSelectUser: (user: User) => void;
   onMessageChange: (message: string) => void;
   onSendMessage: () => void;
+  onSendMessageWithContent: (content: string) => void;
   onLogout: () => void;
 }
 
@@ -42,6 +43,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   onSelectUser,
   onMessageChange,
   onSendMessage,
+  onSendMessageWithContent,
   onLogout
 }) => {
   // Hooks must be INSIDE the component function
@@ -96,6 +98,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
           currentUser={user}
           onMessageChange={onMessageChange}
           onSendMessage={onSendMessage}
+          onSendMessageWithContent={onSendMessageWithContent}
         />
       </div>
 

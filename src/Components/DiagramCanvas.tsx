@@ -615,7 +615,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
     try {
       const imageData = canvas.toDataURL('image/png', 1.0);
       onSend(imageData, 'image');
-      onClose();
+      // Don't call onClose() here - let the parent handle closing after sending
     } catch (error) {
       console.error('Error capturing canvas:', error);
       alert('Failed to capture diagram. Please try again.');

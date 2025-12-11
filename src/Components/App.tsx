@@ -142,12 +142,13 @@ function App() {
   };
 
   // ✅ Send message via socket
-  const sendMessage = () => {
-    if (! newMessage.trim() || !user || !selectedUser) return;
+  const sendMessage = (customContent?: string) => {
+    const content = customContent !== undefined ? customContent : newMessage;
+    if (!content.trim() || !user || !selectedUser) return;
     const messageData = {
       sender_id: user.id,
       receiver_id: selectedUser.id,
-      content: newMessage
+      content: content
     };
     socket.emit('send_message', messageData);
     setNewMessage('');
@@ -379,6 +380,7 @@ function App() {
       onSelectUser={setSelectedUser}
       onMessageChange={setNewMessage}
       onSendMessage={sendMessage}
+      onSendMessageWithContent={sendMessage}
       onLogout={handleLogout}
     />
   );
