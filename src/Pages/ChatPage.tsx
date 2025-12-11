@@ -110,6 +110,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
         }}
       />
     )}
+    <style>{`
+      body {
+        overflow: hidden;
+        height: 100vh;
+      }
+    `}</style>
     </div>
   );
 };

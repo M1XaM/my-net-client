@@ -34,20 +34,6 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn }) => {
         </div>
       );
     }
-
-    // Otherwise render based on current mode
-    // switch () {
-    //   case 'latex': 
-    //     return <LatexMessage content={message.content} isOwnMessage={isOwn} />;
-    //   case 'markdown': 
-    //     return <MarkdownMessage content={message.content} />;
-    //   case 'code': 
-    //     return <CodeMessage content={message.content} />;
-    //   case 'plain':
-    //   default: 
-    //     return <span className="whitespace-pre-wrap">{message.content}</span>;
-    // }
-
     return <UnifiedMessage content={message.content} isOwnMessage={isOwn} />
   };
 

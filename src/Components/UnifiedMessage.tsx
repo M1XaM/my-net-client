@@ -10,25 +10,6 @@ interface UnifiedMessageProps {
   isOwnMessage?: boolean;
 }
 
-// Add inline styles to prevent KaTeX from creating huge gaps
-const mathStyles = `
-  .katex-html {
-    overflow: hidden !important;
-    max-width: 100% !important;
-  }
-  .katex-display {
-    margin: 0.5em 0 !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-  }
-  .katex {
-    font-size: 1em !important;
-  }
-  .unified-message .katex {
-    display: inline-block;
-  }
-`;
-
 const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage = false }) => {
   // Process content to handle LaTeX and convert to markdown-compatible format
   const processContent = (text: string): string => {
@@ -263,7 +244,6 @@ const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage =
 
   return (
     <div className="unified-message break-words">
-      <style>{mathStyles}</style>
       <div className="flex flex-col gap-1">
         {renderContent()}
       </div>
