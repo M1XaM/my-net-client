@@ -5,14 +5,12 @@ interface EmailVerificationPageProps {
   email: string;
   onVerify: (code: string) => void;
   loading: boolean;
-  error: string;
 }
 
 const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
   email,
   onVerify,
   loading,
-  error,
 }) => {
   const [code, setCode] = useState('');
   const [timeLeft, setTimeLeft] = useState(900); // 15 minutes
@@ -60,16 +58,6 @@ const EmailVerificationPage: React.FC<EmailVerificationPageProps> = ({
             <span className="text-sm font-medium text-gray-800">{maskEmail(email)}</span>
           </div>
         </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-100 flex items-center justify-center mt-0.5">
-              <span className="text-red-600 text-xs font-bold">!</span>
-            </div>
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
