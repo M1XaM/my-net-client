@@ -3,9 +3,10 @@ import { io, Socket } from 'socket.io-client';
 import AuthPage from '../Pages/AuthPage';
 import ChatPage from '../Pages/ChatPage';
 import EmailVerificationPage from '../Pages/EmailVerificationPage';
+import toast from 'react-hot-toast';
 
-interface User { 
-  id: number; 
+interface User {
+  id: number;
   username: string;
   access_token?: string;
   csrf_token?: string;
@@ -43,6 +44,10 @@ function App() {
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
+  useEffect(() => {
+    if(String(error).trim() !== "") toast.error(String(error));
+  }, [error])
+
   // ✅ Load user data from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -59,7 +64,7 @@ function App() {
         socket.emit('user_connected', parsedUser);
       } catch (err) {
         const error = err as Error;
-        setError('Failed to parse saved user data: ' + error. message);
+        setError('Failed to parse saved user data: ' + error.message);
         localStorage.removeItem('user');
         localStorage.removeItem('access_token');
         localStorage.removeItem('csrf_token');
@@ -84,7 +89,7 @@ function App() {
     return () => {
       socket.off('receive_message');
       socket.off('users_list');
-      socket. off('connect_error');
+      socket.off('connect_error');
     };
   }, []);
 
@@ -106,7 +111,7 @@ function App() {
           setMessages(data);
         })
         .catch((err: Error) => {
-          setError('Error fetching messages: ' + err. message);
+          setError('Error fetching messages: ' + err.message);
         });
     }
   }, [user, selectedUser, accessToken]);
@@ -191,7 +196,7 @@ function App() {
       setUser({ id: data.id, username: data.username });
       setAccessToken(data.access_token);
       setCsrfToken(data.csrf_token);
-      localStorage.setItem('user', JSON. stringify({ id: data.id, username: data.username }));
+      localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username }));
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('csrf_token', data.csrf_token);
       socket.emit('user_connected', { id: data.id, username: data.username });
@@ -231,13 +236,13 @@ function App() {
         setUser({ id: data.id, username: data.username });
         setAccessToken(data.access_token);
         setCsrfToken(data.csrf_token);
-        localStorage.setItem('user', JSON.stringify({ id: data.id, username: data. username }));
-        localStorage.setItem('access_token', data. access_token);
-        localStorage. setItem('csrf_token', data.csrf_token);
+        localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username }));
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('csrf_token', data.csrf_token);
         socket.emit('user_connected', { id: data.id, username: data.username });
       }
     } catch (err) {
-      setError((err as Error). message);
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -264,7 +269,7 @@ function App() {
         credentials: 'include',
       });
 
-      if (! response.ok) {
+      if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Verification failed');
       }
@@ -272,10 +277,10 @@ function App() {
       const data = await response.json();
 
       // Auto-login after verification
-      setUser({ id: data.id, username: data. username });
+      setUser({ id: data.id, username: data.username });
       setAccessToken(data.access_token);
-      setCsrfToken(data. csrf_token);
-      localStorage. setItem('user', JSON.stringify({ id: data.id, username: data.username }));
+      setCsrfToken(data.csrf_token);
+      localStorage.setItem('user', JSON.stringify({ id: data.id, username: data.username }));
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('csrf_token', data.csrf_token);
 
@@ -316,12 +321,12 @@ function App() {
       const refreshRes = await fetch(`${API_BASE_URL}/token/refresh`, {
         method: 'POST',
         credentials: 'include',
-        headers: csrf ?  { 'X-CSRF-Token': csrf } : {},
+        headers: csrf ? { 'X-CSRF-Token': csrf } : {},
       });
 
-      if (refreshRes. ok) {
+      if (refreshRes.ok) {
         const refreshData = await refreshRes.json();
-        setAccessToken(refreshData. access_token);
+        setAccessToken(refreshData.access_token);
         setCsrfToken(refreshData.csrf_token);
 
         localStorage.setItem('access_token', refreshData.access_token);
@@ -350,7 +355,6 @@ function App() {
         email={verificationState.email || ''}
         onVerify={handleVerifyEmail}
         loading={loading}
-        error={error}
       />
     );
   }
@@ -362,27 +366,27 @@ function App() {
         onLogin={handleLogin}
         onRegister={handleRegister}
         loading={loading}
-        error={error}
       />
     );
   }
 
   // ✅ Show chat page if logged in
   return (
-    <ChatPage
-      user={user}
-      users={users}
-      selectedUser={selectedUser}
-      messages={messages}
-      newMessage={newMessage}
-      error={error}
-      accessToken={accessToken}
-      onSelectUser={setSelectedUser}
-      onMessageChange={setNewMessage}
-      onSendMessage={sendMessage}
-      onSendMessageWithContent={sendMessage}
-      onLogout={handleLogout}
-    />
+    <>
+      <ChatPage
+        user={user}
+        users={users}
+        selectedUser={selectedUser}
+        messages={messages}
+        newMessage={newMessage}
+        accessToken={accessToken}
+        onSelectUser={setSelectedUser}
+        onMessageChange={setNewMessage}
+        onSendMessage={sendMessage}
+        onSendMessageWithContent={sendMessage}
+        onLogout={handleLogout}
+      />
+    </>
   );
 }
 

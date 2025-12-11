@@ -5,14 +5,12 @@ interface AuthPageProps {
   onLogin: (formData: { username: string; password: string; totpCode?: string }) => void;
   onRegister: (formData: { username: string; password: string; email: string }) => void;
   loading: boolean;
-  error: string;
 }
 
 const AuthPage: React.FC<AuthPageProps> = ({
   onLogin,
   onRegister,
   loading,
-  error,
 }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loginForm, setLoginForm] = useState({
@@ -57,13 +55,6 @@ const AuthPage: React.FC<AuthPageProps> = ({
             {isLogin ? "Sign in to continue to MyNet" : "Sign up to get started with MyNet"}
           </p>
         </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-3 bg-red-100 text-red-700 rounded-lg border border-red-200 text-sm">
-            {error}
-          </div>
-        )}
 
         {/* Login Form */}
         {isLogin ? (

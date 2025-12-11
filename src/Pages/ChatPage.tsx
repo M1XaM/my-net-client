@@ -23,7 +23,6 @@ interface ChatPageProps {
   selectedUser: User | null;
   messages: Message[];
   newMessage: string;
-  error: string;
   accessToken: string | null;  // ← This is required
   onSelectUser: (user: User) => void;
   onMessageChange: (message: string) => void;
@@ -38,7 +37,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
   selectedUser,
   messages,
   newMessage,
-  error,
   accessToken,  // ADD THIS
   onSelectUser,
   onMessageChange,
@@ -76,12 +74,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </div>
         </div>
       </header>
-
-      {error && (
-        <div className="mx-6 mt-4 p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 text-sm">
-          {error}
-        </div>
-      )}
 
       <div className="flex flex-1 overflow-hidden">
         <OnlineUsersSidebar
