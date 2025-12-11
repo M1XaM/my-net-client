@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import GoogleLoginButton from "./loginButton";
+import Captcha from "../Components/Captcha";
+import PasswordStrength from "../Components/PasswordStrength";
 
 interface AuthPageProps {
   onLogin: (formData: { username: string; password: string; totpCode?: string }) => void;
@@ -26,6 +28,9 @@ const AuthPage: React.FC<AuthPageProps> = ({
     password: "",
     email: "",
   });
+  const [loginCaptchaVerified, setLoginCaptchaVerified] = useState(false);
+  const [registerCaptchaVerified, setRegisterCaptchaVerified] = useState(false);
+  const [registerPasswordValid, setRegisterPasswordValid] = useState(false);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,9 +133,11 @@ const AuthPage: React.FC<AuthPageProps> = ({
               </label>
             </div>
 
+            <Captcha onVerify={setLoginCaptchaVerified} />
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !loginCaptchaVerified}
               className="w-full bg-[#7B61FF] text-white py-3 rounded-lg font-semibold hover:bg-[#6951E0] transition-colors shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {loading ? "Signing in..." : "Sign In"}
@@ -185,11 +192,17 @@ const AuthPage: React.FC<AuthPageProps> = ({
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7B61FF] focus:border-transparent transition-all"
                 placeholder="••••••••"
               />
+              <PasswordStrength 
+                password={registerForm.password} 
+                onStrengthChange={(_, isValid) => setRegisterPasswordValid(isValid)}
+              />
             </div>
+
+            <Captcha onVerify={setRegisterCaptchaVerified} />
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !registerCaptchaVerified || !registerPasswordValid}
               className="w-full bg-[#7B61FF] text-white py-3 rounded-lg font-semibold hover:bg-[#6951E0] transition-colors shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {loading ? "Creating account..." : "Sign Up"}
@@ -224,7 +237,12 @@ const AuthPage: React.FC<AuthPageProps> = ({
             {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
             <button
               type="button"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setLoginCaptchaVerified(false);
+                setRegisterCaptchaVerified(false);
+                setRegisterPasswordValid(false);
+              }}
               className="text-[#7B61FF] font-semibold hover:text-[#6951E0] transition-colors"
             >
               {isLogin ? "Sign up" : "Sign in"}
