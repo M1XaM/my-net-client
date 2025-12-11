@@ -14,10 +14,11 @@ interface ChatAreaProps {
   currentUser: User | null;
   onMessageChange: (message: string) => void;
   onSendMessage: () => void;
+  onSendMessageWithContent: (content: string) => void;
 }
 
 const ChatArea: React.FC<ChatAreaProps> = ({
-  selectedUser, messages, newMessage, currentUser, onMessageChange, onSendMessage
+  selectedUser, messages, newMessage, currentUser, onMessageChange, onSendMessage, onSendMessageWithContent
 }) => {
   const [showDiagramCanvas, setShowDiagramCanvas] = useState(false);
 
@@ -30,9 +31,9 @@ const ChatArea: React.FC<ChatAreaProps> = ({
   };
 
   const handleSendDiagram = (imageData: string) => {
-    // Send the base64 image data as message content
-    onMessageChange(imageData);
-    onSendMessage();
+    // Send the image data directly without relying on state
+    onSendMessageWithContent(imageData);
+    setShowDiagramCanvas(false);
   };
 
   if (!selectedUser) {
