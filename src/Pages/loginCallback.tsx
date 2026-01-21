@@ -7,7 +7,7 @@ export default function GoogleCallback() {
     const state = queryParams.get("state");
 
     if (code && state) {
-      fetch("https://localhost/api/auth/google/callback", {
+      fetch(`${window.location.origin}/api/auth/google/callback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, state }),
