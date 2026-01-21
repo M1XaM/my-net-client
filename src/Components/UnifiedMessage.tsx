@@ -13,12 +13,11 @@ interface UnifiedMessageProps {
 interface CodeBlockProps {
   code: string;
   language: string;
-  isOwnMessage: boolean;
 }
 
 const SUPPORTED_LANGUAGES = ['python', 'py', 'python3'];
 
-const CodeBlock: React.FC<CodeBlockProps> = ({ code, language, isOwnMessage }) => {
+const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<{ output?: string; error?: string } | null>(null);
   
@@ -94,14 +93,14 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language, isOwnMessage }) =
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                 </svg>
-                Running...
+                Executing...
               </>
             ) : (
               <>
                 <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
                 </svg>
-                Run
+                Execute
               </>
             )}
           </button>
@@ -236,7 +235,6 @@ const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage =
           <CodeBlock 
             code={codeString} 
             language={language} 
-            isOwnMessage={isOwnMessage} 
           />
         );
       }
