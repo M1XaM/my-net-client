@@ -28,8 +28,19 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
     setResult(null);
     
     try {
+      // Try to get token from both storage patterns
       const user = localStorage.getItem('user');
-      const token = user ? JSON.parse(user).access_token : null;
+      let token = localStorage.getItem('access_token');
+      
+      // Also check if token is stored inside user object (Google OAuth)
+      if (!token && user) {
+        try {
+          const userData = JSON.parse(user);
+          token = userData.access_token || null;
+        } catch {
+          // Invalid JSON, ignore
+        }
+      }
       
       const response = await fetch(`${window.location.origin}/api/messages/run-code`, {
         method: 'POST',
