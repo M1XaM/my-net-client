@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -9,6 +9,131 @@ interface UnifiedMessageProps {
   content: string;
   isOwnMessage?: boolean;
 }
+
+interface CodeBlockProps {
+  code: string;
+  language: string;
+  isOwnMessage: boolean;
+}
+
+const SUPPORTED_LANGUAGES = ['python', 'py', 'python3'];
+
+const CodeBlock: React.FC<CodeBlockProps> = ({ code, language, isOwnMessage }) => {
+  const [isRunning, setIsRunning] = useState(false);
+  const [result, setResult] = useState<{ output?: string; error?: string } | null>(null);
+  
+  const isExecutable = SUPPORTED_LANGUAGES.includes(language.toLowerCase());
+  
+  const runCode = async () => {
+    setIsRunning(true);
+    setResult(null);
+    
+    try {
+      const user = localStorage.getItem('user');
+      const token = user ? JSON.parse(user).access_token : null;
+      
+      const response = await fetch(`${window.location.origin}/api/messages/run-code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify({ code })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        setResult({ error: data.detail || 'Failed to execute code' });
+      } else {
+        // Handle both response formats: { output, error } and { stdout, stderr }
+        setResult({ 
+          output: data.output || data.stdout || '', 
+          error: data.error || data.stderr || '' 
+        });
+      }
+    } catch (err) {
+      setResult({ error: 'Failed to connect to server' });
+    } finally {
+      setIsRunning(false);
+    }
+  };
+  
+  return (
+    <div className="my-2">
+      <SyntaxHighlighter 
+        style={vscDarkPlus} 
+        language={language} 
+        PreTag="div" 
+        customStyle={{
+          borderRadius: isExecutable ? '0.5rem 0.5rem 0 0' : '0.5rem',
+          fontSize: '0.875rem',
+          margin: 0,
+          padding: '1rem'
+        }}
+        wrapLines={true}
+        wrapLongLines={true}
+      >
+        {code}
+      </SyntaxHighlighter>
+      
+      {isExecutable && (
+        <div className="bg-[#1e1e1e] rounded-b-lg border-t border-gray-700">
+          <button
+            onClick={runCode}
+            disabled={isRunning}
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium transition-colors ${
+              isRunning 
+                ? 'text-gray-500 cursor-not-allowed' 
+                : 'text-green-400 hover:text-green-300 hover:bg-gray-800'
+            }`}
+          >
+            {isRunning ? (
+              <>
+                <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                Running...
+              </>
+            ) : (
+              <>
+                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                </svg>
+                Run
+              </>
+            )}
+          </button>
+          
+          {result && (
+            <div className="border-t border-gray-700 p-3">
+              {result.output && (
+                <div className="mb-2">
+                  <div className="text-xs text-gray-400 mb-1">Output:</div>
+                  <pre className="text-sm text-green-400 whitespace-pre-wrap font-mono bg-black/30 p-2 rounded">
+                    {result.output}
+                  </pre>
+                </div>
+              )}
+              {result.error && (
+                <div>
+                  <div className="text-xs text-gray-400 mb-1">Error:</div>
+                  <pre className="text-sm text-red-400 whitespace-pre-wrap font-mono bg-black/30 p-2 rounded">
+                    {result.error}
+                  </pre>
+                </div>
+              )}
+              {!result.output && !result.error && (
+                <div className="text-xs text-gray-500 italic">No output</div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage = false }) => {
   // Process content to handle LaTeX and convert to markdown-compatible format
@@ -108,24 +233,11 @@ const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage =
         const language = match ? match[1] : 'javascript';
         
         return (
-          <div className="my-2">
-            <SyntaxHighlighter 
-              style={vscDarkPlus} 
-              language={language} 
-              PreTag="div" 
-              customStyle={{
-                borderRadius: '0.5rem',
-                fontSize: '0.875rem',
-                margin: 0,
-                padding: '1rem'
-              }}
-              wrapLines={true}
-              wrapLongLines={true}
-              {...props}
-            >
-              {codeString}
-            </SyntaxHighlighter>
-          </div>
+          <CodeBlock 
+            code={codeString} 
+            language={language} 
+            isOwnMessage={isOwnMessage} 
+          />
         );
       }
       
