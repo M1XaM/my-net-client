@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { 
   X, Square, Circle, Diamond, User, Minus, Type, Send, Trash2, RotateCcw, 
   Database, Cloud, HardDrive, Download, Grid, ZoomIn, ZoomOut,
-  Lock, Unlock, Copy, Clipboard, Hexagon, Triangle
+  Lock, Unlock, Copy, Clipboard, Hexagon, Triangle, MousePointer
 } from 'lucide-react';
 
 interface CanvasElement {
@@ -686,8 +686,8 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
     }
   };
 
-  const tools: { id: ToolType; icon: typeof Square | string; label: string; emoji?: boolean }[] = [
-    { id: 'select', icon: '→', label: 'Select (V)', emoji: true },
+  const tools: { id: ToolType; icon: typeof Square; label: string }[] = [
+    { id: 'select', icon: MousePointer, label: 'Select (V)' },
     { id: 'rect', icon: Square, label: 'Rectangle (R)' },
     { id: 'ellipse', icon: Circle, label: 'Ellipse (E)' },
     { id: 'diamond', icon: Diamond, label: 'Diamond (D)' },
@@ -766,7 +766,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
                     }`}
                     title={tool.label}
                   >
-                    {tool.emoji ? <span className="text-sm">{tool.icon}</span> : <tool.icon size={16} />}
+                    <tool.icon size={16} />
                   </button>
                 ))}
               </div>
@@ -783,7 +783,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
                     }`}
                     title={tool.label}
                   >
-                    {tool.emoji ? <span className="text-sm">{tool.icon}</span> : <tool.icon size={16} />}
+                    <tool.icon size={16} />
                   </button>
                 ))}
               </div>
