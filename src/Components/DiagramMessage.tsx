@@ -166,7 +166,7 @@ const DiagramMessage: React.FC<DiagramMessageProps> = ({ content }) => {
         ctx.fillText(line, node.x + node.width / 2, y);
       });
 
-    } catch (error) {
+    } catch {
       // error message
       ctx.fillStyle = '#FEE2E2';
       ctx.fillRect(0, 0, canvas.width, canvas.height);

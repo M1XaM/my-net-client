@@ -17,7 +17,7 @@ const PasswordStrength: React.FC<PasswordStrengthProps> = ({ password, onStrengt
     { label: 'Contains uppercase letter', test: (pwd) => /[A-Z]/.test(pwd) },
     { label: 'Contains lowercase letter', test: (pwd) => /[a-z]/.test(pwd) },
     { label: 'Contains number', test: (pwd) => /\d/.test(pwd) },
-    { label: 'Contains special character (!@#$%^&*)', test: (pwd) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd) },
+    { label: 'Contains special character (!@#$%^&*)', test: (pwd) => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pwd) },
   ];
 
   const metRequirements = requirements.filter(req => req.test(password));

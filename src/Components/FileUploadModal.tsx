@@ -143,7 +143,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({ isOpen, onClose, onUp
               base64: result,
               dimensions: { width: canvas.width, height: canvas.height }
             });
-          } catch (err) {
+          } catch {
             reject(new Error('Failed to process image'));
           }
         };

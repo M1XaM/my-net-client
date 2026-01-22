@@ -167,7 +167,7 @@ function App() {
     setError('');
     try {
       const url = `${API_BASE_URL}/login`;
-      const body: any = {
+      const body: Record<string, string> = {
         username: formData.username,
         password: formData.password
       };
@@ -298,12 +298,12 @@ function App() {
   };
 
   // ✅ Authenticated fetch helper with token refresh
-  const fetchWithAuth = async (url: string, options: any = {}) => {
-    let token = accessToken || localStorage.getItem('access_token');
-    let csrf = csrfToken || localStorage.getItem('csrf_token');
+  const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
+    const token = accessToken || localStorage.getItem('access_token');
+    const csrf = csrfToken || localStorage.getItem('csrf_token');
 
-    let headers = {
-      ...(options.headers || {}),
+    const headers: Record<string, string> = {
+      ...(options.headers as Record<string, string> || {}),
       'Authorization': `Bearer ${token}`,
     };
 
