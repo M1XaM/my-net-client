@@ -33,7 +33,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ newMessage, onMessageChange
 
   return (
     <>
-      <div className="flex flex-col px-7 py-4 flex-shrink-0 bg-[#EDF2F7] border-t border-gray-200">
+      <div className="flex flex-col px-7 py-4 flex-shrink-0 bg-[#0a0a0f]/80 backdrop-blur-sm border-t border-white/[0.06]">
         <div className="flex items-end gap-4">
           {/* Upload button */}
           <div 
@@ -47,7 +47,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ newMessage, onMessageChange
               viewBox="0 0 24 24" 
               fill="none" 
               xmlns="http://www.w3.org/2000/svg"
-              className="group-hover:stroke-[#7B61FF] transition-colors"
+              className="text-gray-400 group-hover:text-[#7B61FF] transition-colors"
             >
               <path 
                 d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" 
@@ -59,10 +59,10 @@ const MessageInput: React.FC<MessageInputProps> = ({ newMessage, onMessageChange
             </svg>
           </div>
 
-          <div className="outline-none bg-white w-full rounded-lg border-2 border-gray-200 flex items-end overflow-hidden">
+          <div className="outline-none bg-white/[0.05] w-full rounded-xl border border-white/[0.1] flex items-end overflow-hidden backdrop-blur-sm focus-within:border-[#7B61FF]/50 transition-colors">
             <textarea
               ref={textareaRef}
-              className="border-none p-3 outline-none bg-white w-full text-sm resize-none"
+              className="border-none p-3 outline-none bg-transparent w-full text-sm resize-none text-white placeholder-gray-500"
               placeholder="Your message..."
               value={newMessage}
               onChange={e => onMessageChange(e.target.value)}
@@ -80,7 +80,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ newMessage, onMessageChange
               }}
             />
             <button 
-              className="pr-3 pb-3 cursor-pointer hover:scale-110 transition-transform flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed" 
+              className="pr-3 pb-3 cursor-pointer hover:scale-110 transition-transform flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed" 
               onClick={onSendMessage}
               disabled={!newMessage.trim()}
             >

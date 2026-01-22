@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import AuthPage from '../Pages/AuthPage';
 import ChatPage from '../Pages/ChatPage';
 import EmailVerificationPage from '../Pages/EmailVerificationPage';
+import LandingPage from '../Pages/LandingPage';
 import toast from 'react-hot-toast';
 
 interface User {
@@ -30,6 +31,7 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
+  const [showLanding, setShowLanding] = useState<boolean>(true);
 
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -356,6 +358,13 @@ function App() {
         onVerify={handleVerifyEmail}
         loading={loading}
       />
+    );
+  }
+
+  // ✅ Show landing page for new visitors
+  if (!user && showLanding) {
+    return (
+      <LandingPage onGetStarted={() => setShowLanding(false)} />
     );
   }
 

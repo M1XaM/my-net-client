@@ -31,14 +31,19 @@ const MessageList: React.FC<MessageListProps> = ({ messages, currentUser }) => {
 
   return (
     <div
-      className="flex-1 overflow-y-scroll w-full min-h-0 px-7 py-4" 
+      className="flex-1 overflow-y-auto w-full min-h-0 px-7 py-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent" 
       id="messageContainer"
     >
+      {messages.length === 0 && (
+        <div className="h-full flex items-center justify-center">
+          <p className="text-gray-500 text-sm">No messages yet. Start the conversation!</p>
+        </div>
+      )}
       {messages.map(m => (
         <div 
           key={m.id} 
           ref={setMessageRef(m.id)}
-          className={`flex ${m.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'} my-4`}
+          className={`flex ${m.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'} my-3`}
         >
           <MessageItem 
             message={m} 

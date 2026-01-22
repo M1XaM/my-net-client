@@ -255,14 +255,14 @@ const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage =
         <code className={`px-2 py-0.5 rounded text-sm font-mono ${
           isOwnMessage 
             ? 'bg-white/20 text-white' 
-            : 'bg-purple-100 text-[#7B61FF]'
+            : 'bg-white/10 text-[#a78bfa]'
         }`} {...props}>
           {children}
         </code>
       );
     },
     p: ({ children }: any) => <span className="inline">{children}</span>,
-    strong: ({ children }: any) => <strong className={`font-bold ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>{children}</strong>,
+    strong: ({ children }: any) => <strong className={`font-bold ${isOwnMessage ? 'text-white' : 'text-white'}`}>{children}</strong>,
     em: ({ children }: any) => <em className="italic">{children}</em>,
     a: ({ children, href }: any) => (
       <a href={href} className={`underline ${

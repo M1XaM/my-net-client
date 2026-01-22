@@ -8,7 +8,7 @@ interface MarkdownMessageProps {
 }
 
 const MarkdownMessage: React.FC<MarkdownMessageProps> = ({ content }) => (
-  <div className="markdown-content prose prose-sm max-w-none">
+  <div className="markdown-content prose prose-sm prose-invert max-w-none">
     <ReactMarkdown
       components={{
         code({ inline, className, children, ...props }: any) {
@@ -28,16 +28,16 @@ const MarkdownMessage: React.FC<MarkdownMessageProps> = ({ content }) => (
               {String(children).replace(/\n$/, '')}
             </SyntaxHighlighter>
           ) : (
-            <code className="bg-purple-100 text-[#7B61FF] px-2 py-0.5 rounded text-sm font-mono" {...props}>
+            <code className="bg-white/10 text-[#a78bfa] px-2 py-0.5 rounded text-sm font-mono" {...props}>
               {children}
             </code>
           );
         },
-        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-        strong: ({ children }) => <strong className="font-bold text-gray-900">{children}</strong>,
-        em: ({ children }) => <em className="italic">{children}</em>,
+        p: ({ children }) => <p className="mb-2 last:mb-0 text-gray-200">{children}</p>,
+        strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
+        em: ({ children }) => <em className="italic text-gray-300">{children}</em>,
         a: ({ children, href }) => (
-          <a href={href} className="text-[#7B61FF] hover:text-[#6951E0] underline" target="_blank" rel="noopener noreferrer">
+          <a href={href} className="text-[#7B61FF] hover:text-[#a78bfa] underline" target="_blank" rel="noopener noreferrer">
             {children}
           </a>
         )
