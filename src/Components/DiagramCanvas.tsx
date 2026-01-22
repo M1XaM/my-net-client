@@ -21,6 +21,8 @@ interface CanvasElement {
   dashArray?: number[];
 }
 
+type ToolType = CanvasElement['type'] | 'select';
+
 interface DiagramCanvasProps {
   onClose: () => void;
   onSend: (imageData: string, imageType: 'image') => void;
@@ -30,7 +32,7 @@ interface DiagramCanvasProps {
 const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selectedUser }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [elements, setElements] = useState<CanvasElement[]>([]);
-  const [currentTool, setCurrentTool] = useState<CanvasElement['type'] | 'select'>('select');
+  const [currentTool, setCurrentTool] = useState<ToolType>('select');
   const [currentColor, setCurrentColor] = useState('#2563EB');
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -172,7 +174,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.shadowBlur = 8;
       }
 
-      drawShape(ctx, element, isSelected);
+      drawShape(ctx, element);
       
       ctx.restore();
     });
@@ -180,7 +182,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
     ctx.restore();
   }, [elements, showGrid, zoom, panOffset, selectedElement, strokeWidth]);
 
-  const drawShape = (ctx: CanvasRenderingContext2D, element: CanvasElement, _isSelected: boolean) => {
+  const drawShape = (ctx: CanvasRenderingContext2D, element: CanvasElement) => {
     switch (element.type) {
       case 'rect':
         ctx.fillRect(element.x, element.y, element.width!, element.height!);
@@ -211,7 +213,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.stroke();
         break;
 
-      case 'hexagon':
+      case 'hexagon': {
         const hexW = element.width! / 4;
         ctx.beginPath();
         ctx.moveTo(element.x + hexW, element.y);
@@ -224,6 +226,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.fill();
         ctx.stroke();
         break;
+      }
 
       case 'triangle':
         ctx.beginPath();
@@ -235,7 +238,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.stroke();
         break;
 
-      case 'database':
+      case 'database': {
         const dbHeight = element.height! * 0.15;
         ctx.beginPath();
         ctx.ellipse(element.x + element.width! / 2, element.y + dbHeight / 2, element.width! / 2, dbHeight / 2, 0, 0, 2 * Math.PI);
@@ -250,8 +253,9 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.fill();
         ctx.stroke();
         break;
+      }
 
-      case 'cloud':
+      case 'cloud': {
         ctx.beginPath();
         const r = element.width! / 6;
         
@@ -262,9 +266,10 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.fill();
         ctx.stroke();
         break;
+      }
 
       case 'server':
-      case 'cylinder':
+      case 'cylinder': {
         const cylHeight = element.height! * 0.15;
         ctx.beginPath();
         ctx.ellipse(element.x + element.width! / 2, element.y + cylHeight / 2, element.width! / 2, cylHeight / 2, 0, 0, 2 * Math.PI);
@@ -278,8 +283,9 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.ellipse(element.x + element.width! / 2, element.y + element.height! - cylHeight / 2, element.width! / 2, cylHeight / 2, 0, Math.PI, 2 * Math.PI);
         ctx.stroke();
         break;
+      }
 
-      case 'actor':
+      case 'actor': {
         const centerX = element.x + element.width! / 2;
         const headRadius = element.height! / 5;
         
@@ -306,8 +312,9 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.lineTo(element.x + element.width! * 0.8, element.y + element.height!);
         ctx.stroke();
         break;
+      }
 
-      case 'line':
+      case 'line': {
         ctx.beginPath();
         ctx.moveTo(element.x, element.y);
         ctx.lineTo(element.endX!, element.endY!);
@@ -330,8 +337,9 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.fillStyle = element.color;
         ctx.fill();
         break;
+      }
 
-      case 'text':
+      case 'text': {
         ctx.fillStyle = '#0F172A';
         ctx.font = 'bold 16px system-ui, -apple-system, sans-serif';
         ctx.textAlign = 'left';
@@ -350,6 +358,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
         ctx.fillStyle = '#0F172A';
         ctx.fillText(element.text || '', element.x, element.y);
         break;
+      }
     }
   };
 
@@ -446,7 +455,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
 
     const previewElement: CanvasElement = {
       id: 'preview',
-      type: currentTool as any,
+      type: currentTool as CanvasElement['type'],
       x: startPos.x,
       y: startPos.y,
       width: Math.abs(width),
@@ -457,7 +466,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
       strokeWidth
     };
 
-    drawShape(ctx, previewElement, false);
+    drawShape(ctx, previewElement);
     ctx.restore();
   };
 
@@ -484,7 +493,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
 
     const newElement: CanvasElement = {
       id: Date.now().toString(),
-      type: currentTool as any,
+      type: currentTool as CanvasElement['type'],
       x: finalX,
       y: finalY,
       width: currentTool === 'line' ? undefined : width,
@@ -677,7 +686,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
     }
   };
 
-  const tools = [
+  const tools: { id: ToolType; icon: typeof Square | string; label: string; emoji?: boolean }[] = [
     { id: 'select', icon: '→', label: 'Select (V)', emoji: true },
     { id: 'rect', icon: Square, label: 'Rectangle (R)' },
     { id: 'ellipse', icon: Circle, label: 'Ellipse (E)' },
@@ -749,7 +758,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
                 {tools.slice(0, 6).map(tool => (
                   <button
                     key={tool.id}
-                    onClick={() => setCurrentTool(tool.id as any)}
+                    onClick={() => setCurrentTool(tool.id)}
                     className={`p-1.5 rounded transition-all ${
                       currentTool === tool.id
                         ? 'bg-blue-600 text-white shadow-sm'
@@ -766,7 +775,7 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
                 {tools.slice(6).map(tool => (
                   <button
                     key={tool.id}
-                    onClick={() => setCurrentTool(tool.id as any)}
+                    onClick={() => setCurrentTool(tool.id)}
                     className={`p-1.5 rounded transition-all ${
                       currentTool === tool.id
                         ? 'bg-blue-600 text-white shadow-sm'

@@ -62,7 +62,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
           error: data.error || data.stderr || '' 
         });
       }
-    } catch (err) {
+    } catch {
       setResult({ error: 'Failed to connect to server' });
     } finally {
       setIsRunning(false);
@@ -186,7 +186,7 @@ const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage =
     });
     
     // Replace inline math ($...$) with custom markers (but not \$ escaped)
-    processed = processed.replace(/(?<!\\)\$([^\$\n]+?)(?<!\\)\$/g, (_, math) => {
+    processed = processed.replace(/(?<!\\)\$([^$\n]+?)(?<!\\)\$/g, (_, math) => {
       return `___INLINE_MATH___${math.trim()}___END_INLINE_MATH___`;
     });
     
@@ -233,7 +233,7 @@ const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage =
   };
 
   const markdownComponents = {
-    code({ inline, className, children, ...props }: any) {
+    code({ inline, className, children, ...props }: { inline?: boolean; className?: string; children?: React.ReactNode }) {
       const match = /language-(\w+)/.exec(className || '');
       const codeString = String(children).replace(/\n$/, '');
       
@@ -261,10 +261,10 @@ const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage =
         </code>
       );
     },
-    p: ({ children }: any) => <span className="inline">{children}</span>,
-    strong: ({ children }: any) => <strong className={`font-bold ${isOwnMessage ? 'text-white' : 'text-white'}`}>{children}</strong>,
-    em: ({ children }: any) => <em className="italic">{children}</em>,
-    a: ({ children, href }: any) => (
+    p: ({ children }: { children?: React.ReactNode }) => <span className="inline">{children}</span>,
+    strong: ({ children }: { children?: React.ReactNode }) => <strong className={`font-bold ${isOwnMessage ? 'text-white' : 'text-white'}`}>{children}</strong>,
+    em: ({ children }: { children?: React.ReactNode }) => <em className="italic">{children}</em>,
+    a: ({ children, href }: { children?: React.ReactNode; href?: string }) => (
       <a href={href} className={`underline ${
         isOwnMessage 
           ? 'text-white hover:text-white/80' 
@@ -273,12 +273,12 @@ const UnifiedMessage: React.FC<UnifiedMessageProps> = ({ content, isOwnMessage =
         {children}
       </a>
     ),
-    ul: ({ children }: any) => <ul className="list-disc ml-4 my-2">{children}</ul>,
-    ol: ({ children }: any) => <ol className="list-decimal ml-4 my-2">{children}</ol>,
-    li: ({ children }: any) => <li className="mb-1">{children}</li>,
-    h1: ({ children }: any) => <h1 className="text-xl font-bold my-2">{children}</h1>,
-    h2: ({ children }: any) => <h2 className="text-lg font-bold my-2">{children}</h2>,
-    h3: ({ children }: any) => <h3 className="text-base font-bold my-2">{children}</h3>,
+    ul: ({ children }: { children?: React.ReactNode }) => <ul className="list-disc ml-4 my-2">{children}</ul>,
+    ol: ({ children }: { children?: React.ReactNode }) => <ol className="list-decimal ml-4 my-2">{children}</ol>,
+    li: ({ children }: { children?: React.ReactNode }) => <li className="mb-1">{children}</li>,
+    h1: ({ children }: { children?: React.ReactNode }) => <h1 className="text-xl font-bold my-2">{children}</h1>,
+    h2: ({ children }: { children?: React.ReactNode }) => <h2 className="text-lg font-bold my-2">{children}</h2>,
+    h3: ({ children }: { children?: React.ReactNode }) => <h3 className="text-base font-bold my-2">{children}</h3>,
   };
 
   const renderContent = () => {

@@ -48,7 +48,7 @@ const TwoFactorSetup: React.FC<TwoFactorSetupProps> = ({ accessToken, onClose, o
       onSuccess();
       alert('2FA enabled! ');
       onClose();
-    } catch (err) {
+    } catch {
       setError('Invalid code, try again');
     }
   };

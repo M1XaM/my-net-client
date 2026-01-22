@@ -7,11 +7,17 @@ interface MarkdownMessageProps {
   content: string;
 }
 
+interface CodeProps {
+  inline?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
 const MarkdownMessage: React.FC<MarkdownMessageProps> = ({ content }) => (
   <div className="markdown-content prose prose-sm prose-invert max-w-none">
     <ReactMarkdown
       components={{
-        code({ inline, className, children, ...props }: any) {
+        code({ inline, className, children, ...props }: CodeProps) {
           const match = /language-(\w+)/.exec(className || '');
           return !inline && match ? (
             <SyntaxHighlighter 
