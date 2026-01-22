@@ -36,6 +36,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({
     setShowDiagramCanvas(false);
   };
 
+  const handleSendFile = (base64Content: string) => {
+    // Send file/image content through the existing message system
+    onSendMessageWithContent(base64Content);
+  };
+
   if (!selectedUser) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[#EDF2F7]">
@@ -62,7 +67,8 @@ const ChatArea: React.FC<ChatAreaProps> = ({
         <MessageInput 
           newMessage={newMessage} 
           onMessageChange={onMessageChange} 
-          onSendMessage={onSendMessage} 
+          onSendMessage={onSendMessage}
+          onSendFile={handleSendFile}
         />
       </div>
 

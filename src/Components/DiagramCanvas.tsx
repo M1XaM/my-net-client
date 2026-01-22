@@ -608,12 +608,67 @@ const DiagramCanvas: React.FC<DiagramCanvasProps> = ({ onClose, onSend, selected
     link.click();
   };
 
+  // Compress canvas for sending - now with higher quality limit (90KB)
+  const compressCanvasForSend = (canvas: HTMLCanvasElement, maxLength: number): string => {
+    // Create a canvas for compression
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
+    if (!ctx) return '';
+
+    // Use larger dimensions for better quality (max 800px)
+    let width = Math.min(canvas.width, 800);
+    let height = Math.min(canvas.height, 800);
+    
+    // Maintain aspect ratio
+    const aspectRatio = canvas.width / canvas.height;
+    if (aspectRatio > 1) {
+      height = width / aspectRatio;
+    } else {
+      width = height * aspectRatio;
+    }
+
+    tempCanvas.width = Math.round(width);
+    tempCanvas.height = Math.round(height);
+
+    // White background for JPEG
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    // Start with higher quality
+    let quality = 0.85;
+    let result = tempCanvas.toDataURL('image/jpeg', quality);
+
+    while (result.length > maxLength && quality > 0.3) {
+      quality -= 0.05;
+      result = tempCanvas.toDataURL('image/jpeg', quality);
+    }
+
+    // If still too big, reduce dimensions
+    if (result.length > maxLength) {
+      const scale = Math.sqrt(maxLength / result.length) * 0.9;
+      tempCanvas.width = Math.round(width * scale);
+      tempCanvas.height = Math.round(height * scale);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+      result = tempCanvas.toDataURL('image/jpeg', 0.7);
+    }
+
+    return result;
+  };
+
   const handleSend = () => {
     const canvas = canvasRef.current;
     if (!canvas || elements.length === 0) return;
 
     try {
-      const imageData = canvas.toDataURL('image/png', 1.0);
+      // Compress the image to fit within server limits (90KB now with increased limit)
+      const imageData = compressCanvasForSend(canvas, 90000);
+      if (!imageData) {
+        alert('Failed to process diagram. Please try again.');
+        return;
+      }
       onSend(imageData, 'image');
       // Don't call onClose() here - let the parent handle closing after sending
     } catch (error) {
