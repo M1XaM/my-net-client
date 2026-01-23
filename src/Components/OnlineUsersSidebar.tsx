@@ -135,7 +135,7 @@ const OnlineUsersSidebar: React.FC<OnlineUsersSidebarProps> = ({
       <div className="border-t border-white/[0.06] px-5 py-3 flex-shrink-0">
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <div className="w-2 h-2 bg-green-500 rounded-full" />
-          <span>End-to-end encrypted</span>
+          <span>Hi from developers!</span>
         </div>
       </div>
     </div>
