@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -16,6 +17,7 @@ interface CodeProps {
 const MarkdownMessage: React.FC<MarkdownMessageProps> = ({ content }) => (
   <div className="markdown-content prose prose-sm prose-invert max-w-none">
     <ReactMarkdown
+      rehypePlugins={[rehypeSanitize]}
       components={{
         code({ inline, className, children, ...props }: CodeProps) {
           const match = /language-(\w+)/.exec(className || '');
